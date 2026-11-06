@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using QuanLyCaPheSinhVien_DTO;
 
 namespace QuanLyCaPheSinhVien_DAO
@@ -9,30 +10,27 @@ namespace QuanLyCaPheSinhVien_DAO
             @"Data Source=.\SQLEXPRESS;
               Initial Catalog=QuanLyCafeSinhVien;
               Integrated Security=True";
+
         public bool ThemChiTietHoaDon(ChiTietHoaDonDTO ct)
         {
-            using (SqlConnection conn =
-                new SqlConnection(chuoiKetNoi))
+            using (SqlConnection conn = new SqlConnection(chuoiKetNoi))
             {
                 conn.Open();
 
-                string sql = @"INSERT INTO ChiTietHoaDon
-                    (MaHoaDon, MaMon, SoLuong, DonGia)
-                    VALUES
-                    (@MaHoaDon, @MaMon, @SoLuong, @DonGia)";
+                SqlCommand cmd = new SqlCommand(
+                    "sp_ThemChiTietHoaDon", conn);
 
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@MaHoaDon", ct.MaHoaDon);
                 cmd.Parameters.AddWithValue("@MaMon", ct.MaMon);
                 cmd.Parameters.AddWithValue("@SoLuong", ct.SoLuong);
                 cmd.Parameters.AddWithValue("@DonGia", ct.DonGia);
+
                 int ketQua = cmd.ExecuteNonQuery();
 
                 return ketQua > 0;
             }
         }
-
-
     }
 }

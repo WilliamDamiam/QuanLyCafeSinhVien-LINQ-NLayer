@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using QuanLyCaPheSinhVien_DTO;
-using System.Collections.Generic;
 
 namespace QuanLyCaPheSinhVien_DAO
 {
@@ -14,18 +15,14 @@ namespace QuanLyCaPheSinhVien_DAO
 
         public int ThemHoaDon(HoaDonDTO hd)
         {
-            using (SqlConnection conn =
-                new SqlConnection(chuoiKetNoi))
+            using (SqlConnection conn = new SqlConnection(chuoiKetNoi))
             {
                 conn.Open();
 
-                string sql = @"INSERT INTO HoaDon
-                    (TenKhachHang, SoKhach, LaSinhVien, TongTien)
-                    OUTPUT INSERTED.MaHoaDon
-                    VALUES
-                    (@TenKhachHang, @SoKhach, @LaSinhVien, @TongTien)";
+                SqlCommand cmd = new SqlCommand(
+                    "sp_ThemHoaDon", conn);
 
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue(
                     "@TenKhachHang", hd.TenKhachHang);
@@ -39,7 +36,6 @@ namespace QuanLyCaPheSinhVien_DAO
                 cmd.Parameters.AddWithValue(
                     "@TongTien", hd.TongTien);
 
-                // Them va lay ma hoa don moi
                 int maHoaDon = Convert.ToInt32(
                     cmd.ExecuteScalar());
 
@@ -47,9 +43,12 @@ namespace QuanLyCaPheSinhVien_DAO
             }
         }
 
-        public bool LuuHoaDon(HoaDonDTO hd, List<ChiTietHoaDonDTO> danhSachMon)
+        public bool LuuHoaDon(
+            HoaDonDTO hd,
+            List<ChiTietHoaDonDTO> danhSachMon)
         {
-            if (hd == null || danhSachMon == null || danhSachMon.Count == 0)
+            if (hd == null || danhSachMon == null ||
+                danhSachMon.Count == 0)
             {
                 return false;
             }
@@ -58,70 +57,64 @@ namespace QuanLyCaPheSinhVien_DAO
             {
                 conn.Open();
 
-                SqlTransaction tran = conn.BeginTransaction();
-
-                try
+                using (SqlTransaction tran = conn.BeginTransaction())
                 {
-                    string sql = @"INSERT INTO HoaDon
-                (TenKhachHang, SoKhach, LaSinhVien, TongTien)
-                OUTPUT INSERTED.MaHoaDon
-                VALUES
-                (@Ten, @SoKhach, @SinhVien, @TongTien)";
-
-                    SqlCommand cmd = new SqlCommand(sql, conn, tran);
-
-                    cmd.Parameters.AddWithValue(
-                        "@Ten", hd.TenKhachHang);
-
-                    cmd.Parameters.AddWithValue(
-                        "@SoKhach", hd.SoKhach);
-
-                    cmd.Parameters.AddWithValue(
-                        "@SinhVien", hd.LaSinhVien);
-
-                    cmd.Parameters.AddWithValue(
-                        "@TongTien", hd.TongTien);
-
-                    int maHoaDon = Convert.ToInt32(cmd.ExecuteScalar());
-
-                    foreach (ChiTietHoaDonDTO ct in danhSachMon)
+                    try
                     {
-                        string sqlCT = @"INSERT INTO ChiTietHoaDon
-                    (MaHoaDon, MaMon, SoLuong, DonGia)
-                    VALUES
-                    (@MaHoaDon, @MaMon, @SoLuong, @DonGia)";
+                        SqlCommand cmd = new SqlCommand(
+                            "sp_ThemHoaDon", conn, tran);
 
-                        SqlCommand cmdCT =
-                            new SqlCommand(sqlCT, conn, tran);
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                        cmdCT.Parameters.AddWithValue(
-                            "@MaHoaDon", maHoaDon);
+                        cmd.Parameters.AddWithValue(
+                            "@TenKhachHang", hd.TenKhachHang);
 
-                        cmdCT.Parameters.AddWithValue(
-                            "@MaMon", ct.MaMon);
+                        cmd.Parameters.AddWithValue(
+                            "@SoKhach", hd.SoKhach);
 
-                        cmdCT.Parameters.AddWithValue(
-                            "@SoLuong", ct.SoLuong);
+                        cmd.Parameters.AddWithValue(
+                            "@LaSinhVien", hd.LaSinhVien);
 
-                        cmdCT.Parameters.AddWithValue(
-                            "@DonGia", ct.DonGia);
+                        cmd.Parameters.AddWithValue(
+                            "@TongTien", hd.TongTien);
 
-                        cmdCT.ExecuteNonQuery();
+                        int maHoaDon = Convert.ToInt32(
+                            cmd.ExecuteScalar());
+
+                        foreach (ChiTietHoaDonDTO ct in danhSachMon)
+                        {
+                            SqlCommand cmdCT = new SqlCommand(
+                                "sp_ThemChiTietHoaDon", conn, tran);
+
+                            cmdCT.CommandType =
+                                CommandType.StoredProcedure;
+
+                            cmdCT.Parameters.AddWithValue(
+                                "@MaHoaDon", maHoaDon);
+
+                            cmdCT.Parameters.AddWithValue(
+                                "@MaMon", ct.MaMon);
+
+                            cmdCT.Parameters.AddWithValue(
+                                "@SoLuong", ct.SoLuong);
+
+                            cmdCT.Parameters.AddWithValue(
+                                "@DonGia", ct.DonGia);
+
+                            cmdCT.ExecuteNonQuery();
+                        }
+
+                        tran.Commit();
+
+                        return true;
                     }
-
-                    tran.Commit();
-
-                    return true;
-                }
-                catch
-                {
-                    tran.Rollback();
-                    throw;
+                    catch
+                    {
+                        tran.Rollback();
+                        throw;
+                    }
                 }
             }
         }
-
-
-
     }
 }

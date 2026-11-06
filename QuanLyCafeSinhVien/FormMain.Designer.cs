@@ -104,6 +104,7 @@
             this.Controls.Add(this.lblTieuDe);
             this.Name = "FormMain";
             this.Text = "Hệ Thống Quản Lý Cafe Sinh Viên";
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

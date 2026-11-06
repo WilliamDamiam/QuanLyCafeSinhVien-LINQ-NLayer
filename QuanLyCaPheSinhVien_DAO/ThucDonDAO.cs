@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using QuanLyCaPheSinhVien_DTO;
 
@@ -20,9 +21,10 @@ namespace QuanLyCaPheSinhVien_DAO
             {
                 conn.Open();
 
-                string sql = "SELECT MaMon, TenMon, LoaiMon, DonGia FROM ThucDon";
+                SqlCommand cmd = new SqlCommand(
+                    "sp_LayDanhSachThucDon", conn);
 
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlDataReader reader = cmd.ExecuteReader();
 
@@ -43,9 +45,5 @@ namespace QuanLyCaPheSinhVien_DAO
 
             return danhSach;
         }
-
-
-
-
     }
 }

@@ -70,3 +70,48 @@ VALUES
 (N'Mỳ xào bò', N'Thức ăn', 30000),
 (N'Mỳ cay', N'Thức ăn', 50000);
 GO
+
+USE QuanLyCafeSinhVien;
+GO
+
+CREATE OR ALTER PROCEDURE sp_LayDanhSachThucDon
+AS
+BEGIN
+    SELECT MaMon, TenMon, LoaiMon, DonGia
+    FROM ThucDon;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE sp_ThemHoaDon
+    @TenKhachHang NVARCHAR(100),
+    @SoKhach INT,
+    @LaSinhVien BIT,
+    @TongTien DECIMAL(12,0)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO HoaDon
+        (TenKhachHang, SoKhach, LaSinhVien, TongTien)
+    VALUES
+        (@TenKhachHang, @SoKhach, @LaSinhVien, @TongTien);
+
+    SELECT CAST(SCOPE_IDENTITY() AS INT);
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE sp_ThemChiTietHoaDon
+    @MaHoaDon INT,
+    @MaMon INT,
+    @SoLuong INT,
+    @DonGia DECIMAL(12,0)
+AS
+BEGIN
+    INSERT INTO ChiTietHoaDon
+        (MaHoaDon, MaMon, SoLuong, DonGia)
+    VALUES
+        (@MaHoaDon, @MaMon, @SoLuong, @DonGia);
+END;
+GO
+
