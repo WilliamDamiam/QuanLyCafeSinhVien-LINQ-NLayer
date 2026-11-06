@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../QuanLyCaPheSinhVien_BUS/QuanLyCaPheSinhVien_BUS.csproj" Id="320c2b2a-6875-48d9-9dd0-5cced75c1704" />
+  <Project Path="../QuanLyCaPheSinhVien_DAO/QuanLyCaPheSinhVien_DAO.csproj" Id="59a1765e-1e46-4350-a48c-4cc9b5fcb0ce" />
+  <Project Path="../QuanLyCaPheSinhVien_DTO/QuanLyCaPheSinhVien_DTO.csproj" Id="18a2d0a5-ebd7-4e5d-b99e-79392d4fe4a3" />
+  <Project Path="QuanLyCafeSinhVien_GUI.csproj" Id="7fe343ce-8130-410c-9921-74fe1f9c13fc" />
+</Solution>
